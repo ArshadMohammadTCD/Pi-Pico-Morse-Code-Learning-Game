@@ -1,7 +1,7 @@
 # MicroprocessorsGroup28
 
 Jamie : #Shalom
-Kevin :
+Kevin : L + ratio + no GPIOs
 Tom : 
 Ammar : 
 Arshad : Hewwo evewybody
