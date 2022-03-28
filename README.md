@@ -1,6 +1,13 @@
 # MicroprocessorsGroup28
 
-#Shalom
+Jamie : #Shalom
+Kevin :
+Tom : 
+Ammar : 
+Arshad : Hewwo evewybody
+
+
+
 
 ## Getting started
 
