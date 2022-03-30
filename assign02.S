@@ -18,6 +18,10 @@
 .equ LED_VAL_ON, 1 @ Specify value that turns the LED "on"
 .equ LED_VAL_OFF, 0 @ Specify value that turns the LED "off"
 .equ GPIO_ISR_OFFSET, 0x74 @ GPIO is int #13 (vector table entry 29)
+.equ ONE_SECOND, 500000 @ GPIO is int #13 (vector table entry 29)
+
+.equ MORSE_MEMORY_BEGINNING, 0x10000010 @ GPIO is int #13 (vector table entry 29)
+
 
 @ Entry point to the ASM portion of the program
 //
@@ -27,11 +31,11 @@ main_asm:
     bl    init_leds           // Same as previous labs
     bl    init_btns           // Use asm_gpio_set_irq C function to setup falling-edge interrupts
     bl    install_gpio_isr    // See below
-    ldr   r6, =DFLT_ALARM_TIME
-    ldr   r5, =1
+    ldr   r12, =-1             // Counter variable for Morse Memory
 loop:
     bl    set_alarm           // Set a new alarm
     wfi                       // Wait here until any interrupt fires
+                              // Need to implement logic to get back to C
     b     loop                // Always branch back to loop
     
 
@@ -72,17 +76,31 @@ gpio_isr:
     cmp     r0, r1
     beq     begin_timer
 
+    ldr     r1, =(TIMER_BASE + TIMER_TIMELR_OFFSET)
+    subs    r0, r1, r8                                      //Duration of button press
+    adds    r12, r12, #1                                    //Increment morse memory counter
+    bl      morse_writer
+
+    ldr     r10, =(TIMER_BASE + TIMER_TIMELR_OFFSET)        //First time stamp for TIME_BETWEEN_PRESSES 
+    ldr     r0, GPIO_BTN_RISE_MSK
+    b       end
+
 
 begin_timer:
-    ldr     r8, =(TIMER_BASE + TIMER_TIMELR_OFFSET)         // Get the current timer count from (TIMER_BASE + TIMER_TIMELR_OFFSET) register  
+    ldr     r8, =(TIMER_BASE + TIMER_TIMELR_OFFSET)         //Get the current timer count from (TIMER_BASE + TIMER_TIMELR_OFFSET) register 
+    subs    r11, r8, r10                                    //Time since last button press
     ldr     r0, GPIO_BTN_FALL_MSK
     b       end                          
     
-   
 end:
     ldr     r2, =(IO_BANK0_BASE + IO_BANK0_INTR2_OFFSET)
     str     r0, [r2]                                        //Acknowledge whatever interrupt was called by one of the three buttons
     POP     {pc}
+
+
+
+
+
 
 
 init_leds:
@@ -94,6 +112,10 @@ init_leds:
     movs    r1, #GPIO_DIR_OUT            // We want this GPIO pin to be setup as an output pin
     bl      asm_gpio_set_dir             // Specify the GPIO pin as an output pin
     POP     {pc}
+
+
+
+
 
 init_btns:
     PUSH    {lr}
@@ -114,6 +136,40 @@ init_btns:
     POP     {pc}
 
     
+
+
+morse_writer:
+    PUSH    {lr}
+    ldr     r2, =ONE_SECOND
+    cmp     r11, r2 
+    bge     input_space
+dot_or_dash:
+    cmp     r0, r2
+    ble     its_a_dot
+
+    ldr     r0, =2
+    ldr     r1, =MORSE_MEMORY
+    strb    r0, [r1, r12]
+    b       end
+
+
+its_a_dot:
+    ldr     r0, =1
+    ldr     r1, =MORSE_MEMORY                     //Store 1 in Dot_Memory
+    strb    r0, [r1, r12]
+    b       end
+
+input_space:
+    ldr     r0, =3
+    ldr     r1, =MORSE_MEMORY
+    strb    r0, [r1, r12]                         //Store space in memory using r12 offset for appropriate byte
+    adds    r12, r12, #1
+    b       dot_or_dash
+
+end:
+    POP     {pc}
+
+
 
 main_loop:
  b main_loop
