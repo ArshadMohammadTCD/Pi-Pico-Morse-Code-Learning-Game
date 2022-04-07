@@ -30,7 +30,20 @@ void asm_gpio_set_irq_rise(uint pin) {
 // Main entry point of the application
 int main() {
  stdio_init_all(); // Initialise all basic IO
- printf("Assignment #2...\n"); // Basic print to console
+ 
+ printf("██     ██ ███████ ██       ██████  ██████  ███    ███ ███████ ██ \n");
+ printf("██     ██ ██      ██      ██      ██    ██ ████  ████ ██      ██ \n");
+ printf("██  █  ██ █████   ██      ██      ██    ██ ██ ████ ██ █████   ██ \n");
+ printf("██ ███ ██ ██      ██      ██      ██    ██ ██  ██  ██ ██         \n");
+ printf(" ███ ███  ███████ ███████  ██████  ██████  ██      ██ ███████ ██ \n");
+ printf("                                                                 \n");
+ printf("                                                                 \n");
+ printf(" ██████  ██████   ██████  ██    ██ ██████      ██████   █████    \n");
+ printf("██       ██   ██ ██    ██ ██    ██ ██   ██          ██ ██   ██   \n");
+ printf("██   ███ ██████  ██    ██ ██    ██ ██████       █████   █████    \n");
+ printf("██    ██ ██   ██ ██    ██ ██    ██ ██          ██      ██   ██   \n");
+ printf(" ██████  ██   ██  ██████   ██████  ██          ███████  █████    \n");
+
  main_asm(); // Jump into the ASM code
  return 0; // Application return code
 }
