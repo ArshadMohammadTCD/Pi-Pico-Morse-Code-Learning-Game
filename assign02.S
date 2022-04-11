@@ -32,9 +32,9 @@ main_asm:
     bl    init_leds           // Same as previous labs
     bl    init_btns           // Use asm_gpio_set_irq C function to setup falling-edge interrupts
     bl    install_gpio_isr    // See below
-    ldr   r9, =1              //Boolean variable for checking if its first press
-    ldr   r11, =-1            //Initialise time between presses register with -1
-    ldr   r12, =0             // Counter variable for Morse Memory
+    ldr   r5, =1              //Boolean variable for checking if its first press
+    ldr   r6, =-1             //Initialise time between presses register with -1
+    ldr   r7, =0              // Counter variable for Morse Memory
 loop:
     wfi                       // Wait here until any interrupt fires
     b     loop                // Always branch back to loop
@@ -79,25 +79,25 @@ gpio_isr:
 
 //Program reaches here if the button was released
     ldr     r1, =(TIMER_BASE + TIMER_TIMELR_OFFSET)
-    subs    r0, r1, r8                                      //Duration of button press      
+    subs    r0, r1, r4                                      //Duration of button press      
     bl      morse_writer
 
-    ldr     r10, =(TIMER_BASE + TIMER_TIMELR_OFFSET)        //First time stamp for TIME_BETWEEN_PRESSES 
-    ldr     r0, GPIO_BTN_RISE_MSK
+    ldr     r3, =(TIMER_BASE + TIMER_TIMELR_OFFSET)        //First time stamp for TIME_BETWEEN_PRESSES 
+    ldr     r0, =GPIO_BTN_RISE_MSK
     b       end
 
 
 begin_timer:
-    ldr     r8, =(TIMER_BASE + TIMER_TIMELR_OFFSET)         //Get the current timer count from (TIMER_BASE + TIMER_TIMELR_OFFSET) register 
-    cmp     r9, #1
+    ldr     r4, =(TIMER_BASE + TIMER_TIMELR_OFFSET)         //Get the current timer count from (TIMER_BASE + TIMER_TIMELR_OFFSET) register 
+    cmp     r5, #1
     beq     disable_first_press
-    subs    r11, r8, r10  
-    ldr     r0, GPIO_BTN_FALL_MSK                           //Time for TIME_BETWEEN_PRESSES
+    subs    r6, r4, r3                                      //Time for TIME_BETWEEN_PRESSES
+    ldr     r0, =GPIO_BTN_FALL_MSK                           
     b       end
 
 disable_first_press:
-    ldr     r9, =0  
-    ldr     r0, GPIO_BTN_FALL_MSK                       
+    ldr     r5, =0  
+    ldr     r0, =GPIO_BTN_FALL_MSK                       
     
 end:
     ldr     r2, =(IO_BANK0_BASE + IO_BANK0_INTR2_OFFSET)
@@ -144,51 +144,52 @@ init_btns:
 
 morse_writer:
     PUSH    {lr}
-    cmp     r11, -1                                 //Check if this is the first press by reading r11 register
+    ldr     r2, =-1
+    cmp     r6, r2                                  //Check if this is the first press by reading r11 register
     beq     dot_or_dash                             //If so next input will be a dot or dash, can't be a space
 
     ldr     r2, =TWO_SECONDS
-    cmp     r11, r2 
+    cmp     r6, r2 
     bge     terminate_string
     ldr     r2, =ONE_SECOND                         
-    cmp     r11, r2 
+    cmp     r6, r2 
     bge     input_space
 
 dot_or_dash:
     cmp     r0, r2                                  //r0 is how long the button was pressed for
     blt     its_a_dot
 
-    ldr     r0, =2
+    ldr     r0, =45                                 //ASCII code for a hyphen
     ldr     r1, =MORSE_MEMORY
-    strb    r0, [r1, r12]
-    adds    r12, r12, #1
-    b       end
+    strb    r0, [r1, r7]
+    adds    r7, r7, #1
+    b       end_morse
 
 
 its_a_dot:
-    ldr     r0, =1
-    ldr     r1, =MORSE_MEMORY                     //Store 1 in MORSE_MEMORY
-    strb    r0, [r1, r12]
-    adds    r12, r12, #1
-    b       end
+    ldr     r0, =46                                 //ASCII code for a period
+    ldr     r1, =MORSE_MEMORY                       //Store 1 in MORSE_MEMORY
+    strb    r0, [r1, r7]
+    adds    r7, r7, #1
+    b       end_morse
 
 input_space:
-    ldr     r0, =3
+    ldr     r0, =32                                 //ASCII code for a space
     ldr     r1, =MORSE_MEMORY
-    strb    r0, [r1, r12]                         //Store space in memory using r12 offset for appropriate byte
-    adds    r12, r12, #1
+    strb    r0, [r1, r7]                           //Store space in memory using r12 offset for appropriate byte
+    adds    r7, r7, #1
     b       dot_or_dash
 
 terminate_string:
     ldr     r0, =0
     ldr     r1, =MORSE_MEMORY
-    strb    r0, [r1, r12]
-    ldr     r12, =0                                 //Reset counter variable for Morse Memory
-    ldr     r11, =-1                                //Reset time between presses variable
-    ldr     r9, =1                                  //Reset is_first_press variable
+    strb    r0, [r1, r7]
+    ldr     r7, =0                                 //Reset counter variable for Morse Memory
+    ldr     r6, =-1                                //Reset time between presses variable
+    ldr     r5, =1                                 //Reset is_first_press variable
     ldr     r0, =MORSE_MEMORY
     bl      readMorseString
-end:
+end_morse:
     POP     {pc}
 
 
