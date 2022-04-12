@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
@@ -71,6 +72,9 @@ const morseChar x = {88, X, 5};
 const morseChar y = {89, Y, 5};
 const morseChar z = {90, Z, 5};
 
+char * morseString;     //Declare array to store morse string in
+int morseStringIndex = 0;
+
 // Declare the main assembly code entry point.
 void main_asm();
 
@@ -110,6 +114,13 @@ void asm_gpio_set_irq_rise(uint pin) {
     gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_RISE, true);
 }
 
+void morseStringAdd(char characterToAdd)
+{
+    morseString[morseStringIndex] = characterToAdd;
+    printf("%c", morseString[morseStringIndex]);
+    morseStringIndex++;
+}
+
 bool compareMorseStruct(char * inputMorse, int inputLength, char * patternMorse, int patternLength)
 {
     if(inputLength != patternLength) return false;
@@ -120,7 +131,8 @@ bool compareMorseStruct(char * inputMorse, int inputLength, char * patternMorse,
     return true;
 }
 
-char readMorseString(char * morseString)
+//This function checks what character the input morse string represents, and returns that character if there is a match. Else it returns the space character
+char readMorseString()
 {
     char currChar = morseString[0];
     int length = 0;
@@ -129,44 +141,40 @@ char readMorseString(char * morseString)
         currChar = morseString[i];
         length++;
     }
-    length++;
 
-    compareMorseStruct(morseString, length, A, a.morseLength);
-    compareMorseStruct(morseString, length, B, b.morseLength);
-    compareMorseStruct(morseString, length, C, c.morseLength);
-    compareMorseStruct(morseString, length, D, d.morseLength);
-    compareMorseStruct(morseString, length, E, e.morseLength);
-    compareMorseStruct(morseString, length, F, f.morseLength);
-    compareMorseStruct(morseString, length, G, g.morseLength);
-    compareMorseStruct(morseString, length, H, h.morseLength);
-    compareMorseStruct(morseString, length, I, i.morseLength);
-    compareMorseStruct(morseString, length, J, j.morseLength);
-    compareMorseStruct(morseString, length, K, k.morseLength);
-    compareMorseStruct(morseString, length, L, l.morseLength);
-    compareMorseStruct(morseString, length, M, m.morseLength);
-    compareMorseStruct(morseString, length, N, n.morseLength);
-    compareMorseStruct(morseString, length, O, o.morseLength);
-    compareMorseStruct(morseString, length, P, p.morseLength);
-    compareMorseStruct(morseString, length, Q, q.morseLength);
-    compareMorseStruct(morseString, length, R, r.morseLength);
-    compareMorseStruct(morseString, length, S, s.morseLength);
-    compareMorseStruct(morseString, length, T, t.morseLength);
-    compareMorseStruct(morseString, length, U, u.morseLength);
-    compareMorseStruct(morseString, length, V, v.morseLength);
-    compareMorseStruct(morseString, length, W, w.morseLength);
-    compareMorseStruct(morseString, length, X, x.morseLength);
-    compareMorseStruct(morseString, length, Y, y.morseLength);
-    compareMorseStruct(morseString, length, Z, z.morseLength);
-    return ' ';
+    if(compareMorseStruct(morseString, length, A, a.morseLength)) return a.AsciiChar;
+    else if(compareMorseStruct(morseString, length, B, b.morseLength)) return b.AsciiChar;
+    else if(compareMorseStruct(morseString, length, C, c.morseLength)) return c.AsciiChar;
+    else if(compareMorseStruct(morseString, length, D, d.morseLength)) return d.AsciiChar;
+    else if(compareMorseStruct(morseString, length, E, e.morseLength)) return e.AsciiChar;
+    else if(compareMorseStruct(morseString, length, F, f.morseLength)) return f.AsciiChar;
+    else if(compareMorseStruct(morseString, length, G, g.morseLength)) return g.AsciiChar;
+    else if(compareMorseStruct(morseString, length, H, h.morseLength)) return h.AsciiChar;
+    else if(compareMorseStruct(morseString, length, I, i.morseLength)) return i.AsciiChar;
+    else if(compareMorseStruct(morseString, length, J, j.morseLength)) return j.AsciiChar;
+    else if(compareMorseStruct(morseString, length, K, k.morseLength)) return k.AsciiChar;
+    else if(compareMorseStruct(morseString, length, L, l.morseLength)) return l.AsciiChar;
+    else if(compareMorseStruct(morseString, length, M, m.morseLength)) return m.AsciiChar;
+    else if(compareMorseStruct(morseString, length, N, n.morseLength)) return n.AsciiChar;
+    else if(compareMorseStruct(morseString, length, O, o.morseLength)) return o.AsciiChar;
+    else if(compareMorseStruct(morseString, length, P, p.morseLength)) return p.AsciiChar;
+    else if(compareMorseStruct(morseString, length, Q, q.morseLength)) return q.AsciiChar;
+    else if(compareMorseStruct(morseString, length, R, r.morseLength)) return r.AsciiChar;
+    else if(compareMorseStruct(morseString, length, S, s.morseLength)) return s.AsciiChar;
+    else if(compareMorseStruct(morseString, length, T, t.morseLength)) return t.AsciiChar;
+    else if(compareMorseStruct(morseString, length, U, u.morseLength)) return u.AsciiChar;
+    else if(compareMorseStruct(morseString, length, V, v.morseLength)) return v.AsciiChar;
+    else if(compareMorseStruct(morseString, length, W, w.morseLength)) return w.AsciiChar;
+    else if(compareMorseStruct(morseString, length, X, x.morseLength)) return x.AsciiChar;
+    else if(compareMorseStruct(morseString, length, Y, y.morseLength)) return y.AsciiChar;
+    else if(compareMorseStruct(morseString, length, Z, z.morseLength)) return z.AsciiChar;
+    else return ' ';
 }
 
 // Main entry point of the application
 int main() {
-    
-
+    morseString = calloc(50, sizeof(char));
     stdio_init_all(); // Initialise all basic IO
-
-    printf("%i", a.morseLength);
  
     printf("██     ██ ███████ ██       ██████  ██████  ███    ███ ███████ ██ \n");
     printf("██     ██ ██      ██      ██      ██    ██ ████  ████ ██      ██ \n");
