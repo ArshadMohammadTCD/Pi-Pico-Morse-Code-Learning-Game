@@ -2,7 +2,7 @@
 add_executable(assign02)
 
 # Specify the source files to be compiled.
-target_sources(assign02 PRIVATE assign02.c assign02.S)
+target_sources(assign02 PRIVATE assign02.c assign02.S assign02.h level01.c level01.h)
 
 # Pull in commonly used features.
 target_link_libraries(assign02 PRIVATE pico_stdlib)
