@@ -3,6 +3,7 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "assign02.h"
+#include <time.h>
 
 // Declare the main assembly code entry point.
 void main_asm();
@@ -60,14 +61,24 @@ bool compareMorseStruct(char * inputMorse, int inputLength, char * patternMorse,
     return true;
 }
 
+void clearMorseString()
+{
+    for(int i = 0; i < 50; i++)
+    {
+        morseString[i] = 0;
+    }
+    morseStringIndex = 0;
+}
+
 void increaseLifeCount()
 {
     if(lifeCount < 3) lifeCount++;
 }
 
 //This function checks what character the input morse string represents, and returns that character if there is a match. Else it returns the space character
-char readMorseString()
+void readMorseString()
 {
+    printf("\n");               //skip line from morse adding
     char currChar = morseString[0];
     int length = 0;
     for(int i = 0; currChar != '\0'; i++)
@@ -115,14 +126,22 @@ char readMorseString()
     else if(compareMorseStruct(morseString, length, NINE, nine.morseLength)) currChar = nine.AsciiChar;
     else currChar = '?';
 
+    printf("You entered %c\n", currChar);
+
     if(currentLevel == 0) 
     {
         if(currChar == 'E') 
         {
             currentLevel = 1;
+            lifeCount = 3;
             currentCharacter = level01();
         }
-        if(currChar == '2') printf("howdy"); //level02();
+        else if(currChar == '2')
+        {
+            currentLevel = 2;
+            lifeCount = 3;
+            currentCharacter = level02();
+        }
         else printf("wrong input");
     }
     else
@@ -130,14 +149,33 @@ char readMorseString()
         if(currentCharacter == currChar)
         {
             correctInARow++;
+            printf("Correct! Current win streak: %i\n", correctInARow);
+            if(correctInARow == 5)
+            {
+                correctInARow = 0;
+                if(currentLevel == 1) currentLevel = 2;
+                if(currentLevel == 2) printf("You Win!");
+            }
+            increaseLifeCount();
+            printf("%i\n", correctInARow);
+            if(currentLevel == 1) currentCharacter = level01();
+            else if (currentLevel == 2) currentCharacter = level02();
         }
-        else lifeCount--;
+        else 
+        {
+            lifeCount--;
+            correctInARow = 0;
+            if(lifeCount == 0) printf("You Lost!");
+            else if(lifeCount == 1) printf("Wrong! You lost a life! You have %i life remaining\n", lifeCount);
+            else printf("Wrong! You lost a life! You have %i lives remaining\n", lifeCount);
+        }
     }
-    return currChar;
+    clearMorseString();
 }
 
 // Main entry point of the application
 int main() {
+    srand ( time(NULL) );
     currentLevel = 0;
     morseString = calloc(50, sizeof(char));
     stdio_init_all(); // Initialise all basic IO
@@ -155,8 +193,8 @@ int main() {
     printf("██    ██ ██   ██ ██    ██ ██    ██ ██          ██      ██   ██   \n");
     printf(" ██████  ██   ██  ██████   ██████  ██          ███████  █████    \n");
 
-    printf("enter .. for level 1");
-    printf("enter -- for level 2");
+    printf("enter .. for level 1\n");
+    printf("enter -- for level 2\n");
 
     //char input = readMorseString;
     main_asm(); // Jump into the ASM code

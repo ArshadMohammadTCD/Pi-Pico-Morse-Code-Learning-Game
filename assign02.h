@@ -91,6 +91,7 @@ int randomNumberOrder[36];
 char currentCharacter;
 
 char level01();
+char level02();
 void increaseLifeCount();
 
 void asm_gpio_init(uint pin);
@@ -101,4 +102,4 @@ void asm_gpio_set_irq_fall(uint pin);
 void asm_gpio_set_irq_rise(uint pin);
 void morseStringAdd(char characterToAdd);
 bool compareMorseStruct(char * inputMorse, int inputLength, char * patternMorse, int patternLength);
-char readMorseString();
+void readMorseString();
