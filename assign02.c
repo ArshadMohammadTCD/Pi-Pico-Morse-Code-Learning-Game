@@ -3,7 +3,6 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "assign02.h"
-#include "level01.h"
 
 // Declare the main assembly code entry point.
 void main_asm();
@@ -61,6 +60,11 @@ bool compareMorseStruct(char * inputMorse, int inputLength, char * patternMorse,
     return true;
 }
 
+void increaseLifeCount()
+{
+    if(lifeCount < 3) lifeCount++;
+}
+
 //This function checks what character the input morse string represents, and returns that character if there is a match. Else it returns the space character
 char readMorseString()
 {
@@ -113,13 +117,21 @@ char readMorseString()
 
     if(currentLevel == 0) 
     {
-        if(currChar == '1') level01();
+        if(currChar == 'E') 
+        {
+            currentLevel = 1;
+            currentCharacter = level01();
+        }
         if(currChar == '2') printf("howdy"); //level02();
         else printf("wrong input");
     }
     else
     {
-
+        if(currentCharacter == currChar)
+        {
+            correctInARow++;
+        }
+        else lifeCount--;
     }
     return currChar;
 }

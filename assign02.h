@@ -82,9 +82,16 @@ const morseChar nine = {57, NINE, 6};
 
 char * morseString;     //Declare array to store morse string in
 int morseStringIndex = 0;
-int numberOfLives;
 int currentLevel;
-char levelChar;
+
+int lifeCount;
+int correctInARow;
+int randomArrayIndex;
+int randomNumberOrder[36];
+char currentCharacter;
+
+char level01();
+void increaseLifeCount();
 
 void asm_gpio_init(uint pin);
 void asm_gpio_set_dir(uint pin, bool out);

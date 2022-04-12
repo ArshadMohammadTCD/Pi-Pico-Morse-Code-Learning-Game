@@ -1,6 +1,5 @@
-int lifeCount;
-int correctInARow;
-int randomArrayIndex;
-int randomNumberOrder[36];
+#ifndef level1
+#define level1
 
-void level01();
+
+#endif
