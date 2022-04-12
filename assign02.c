@@ -4,12 +4,12 @@
 #include "hardware/gpio.h"
 #include "hardware/pio.h"
 #include "assign02.h"
+#include <time.h>
 #include "ws2812.pio.h"
 
 #define IS_RGBW true        // Will use RGBW format
 #define NUM_PIXELS 1        // There is 1 WS2812 device in the chain
 #define WS2812_PIN 28       // The GPIO pin that the WS2812 connected to
-
 
 // Declare the main assembly code entry point.
 void main_asm();
@@ -83,9 +83,24 @@ bool compareMorseStruct(char * inputMorse, int inputLength, char * patternMorse,
     return true;
 }
 
-//This function checks what character the input morse string represents, and returns that character if there is a match. Else it returns the space character
-char readMorseString()
+void clearMorseString()
 {
+    for(int i = 0; i < 50; i++)
+    {
+        morseString[i] = 0;
+    }
+    morseStringIndex = 0;
+}
+
+void increaseLifeCount()
+{
+    if(lifeCount < 3) lifeCount++;
+}
+
+//This function checks what character the input morse string represents, and returns that character if there is a match. Else it returns the space character
+void readMorseString()
+{
+    printf("\n");               //skip line from morse adding
     char currChar = morseString[0];
     int length = 0;
     for(int i = 0; currChar != '\0'; i++)
@@ -94,48 +109,96 @@ char readMorseString()
         length++;
     }
 
-    if(compareMorseStruct(morseString, length, A, a.morseLength)) return a.AsciiChar;
-    else if(compareMorseStruct(morseString, length, B, b.morseLength)) return b.AsciiChar;
-    else if(compareMorseStruct(morseString, length, C, c.morseLength)) return c.AsciiChar;
-    else if(compareMorseStruct(morseString, length, D, d.morseLength)) return d.AsciiChar;
-    else if(compareMorseStruct(morseString, length, E, e.morseLength)) return e.AsciiChar;
-    else if(compareMorseStruct(morseString, length, F, f.morseLength)) return f.AsciiChar;
-    else if(compareMorseStruct(morseString, length, G, g.morseLength)) return g.AsciiChar;
-    else if(compareMorseStruct(morseString, length, H, h.morseLength)) return h.AsciiChar;
-    else if(compareMorseStruct(morseString, length, I, i.morseLength)) return i.AsciiChar;
-    else if(compareMorseStruct(morseString, length, J, j.morseLength)) return j.AsciiChar;
-    else if(compareMorseStruct(morseString, length, K, k.morseLength)) return k.AsciiChar;
-    else if(compareMorseStruct(morseString, length, L, l.morseLength)) return l.AsciiChar;
-    else if(compareMorseStruct(morseString, length, M, m.morseLength)) return m.AsciiChar;
-    else if(compareMorseStruct(morseString, length, N, n.morseLength)) return n.AsciiChar;
-    else if(compareMorseStruct(morseString, length, O, o.morseLength)) return o.AsciiChar;
-    else if(compareMorseStruct(morseString, length, P, p.morseLength)) return p.AsciiChar;
-    else if(compareMorseStruct(morseString, length, Q, q.morseLength)) return q.AsciiChar;
-    else if(compareMorseStruct(morseString, length, R, r.morseLength)) return r.AsciiChar;
-    else if(compareMorseStruct(morseString, length, S, s.morseLength)) return s.AsciiChar;
-    else if(compareMorseStruct(morseString, length, T, t.morseLength)) return t.AsciiChar;
-    else if(compareMorseStruct(morseString, length, U, u.morseLength)) return u.AsciiChar;
-    else if(compareMorseStruct(morseString, length, V, v.morseLength)) return v.AsciiChar;
-    else if(compareMorseStruct(morseString, length, W, w.morseLength)) return w.AsciiChar;
-    else if(compareMorseStruct(morseString, length, X, x.morseLength)) return x.AsciiChar;
-    else if(compareMorseStruct(morseString, length, Y, y.morseLength)) return y.AsciiChar;
-    else if(compareMorseStruct(morseString, length, Z, z.morseLength)) return z.AsciiChar;
+    if(compareMorseStruct(morseString, length, A, a.morseLength)) currChar = a.AsciiChar;
+    else if(compareMorseStruct(morseString, length, B, b.morseLength)) currChar = b.AsciiChar;
+    else if(compareMorseStruct(morseString, length, C, c.morseLength)) currChar = c.AsciiChar;
+    else if(compareMorseStruct(morseString, length, D, d.morseLength)) currChar = d.AsciiChar;
+    else if(compareMorseStruct(morseString, length, E, e.morseLength)) currChar = e.AsciiChar;
+    else if(compareMorseStruct(morseString, length, F, f.morseLength)) currChar = f.AsciiChar;
+    else if(compareMorseStruct(morseString, length, G, g.morseLength)) currChar = g.AsciiChar;
+    else if(compareMorseStruct(morseString, length, H, h.morseLength)) currChar = h.AsciiChar;
+    else if(compareMorseStruct(morseString, length, I, i.morseLength)) currChar = i.AsciiChar;
+    else if(compareMorseStruct(morseString, length, J, j.morseLength)) currChar = j.AsciiChar;
+    else if(compareMorseStruct(morseString, length, K, k.morseLength)) currChar = k.AsciiChar;
+    else if(compareMorseStruct(morseString, length, L, l.morseLength)) currChar = l.AsciiChar;
+    else if(compareMorseStruct(morseString, length, M, m.morseLength)) currChar = m.AsciiChar;
+    else if(compareMorseStruct(morseString, length, N, n.morseLength)) currChar = n.AsciiChar;
+    else if(compareMorseStruct(morseString, length, O, o.morseLength)) currChar = o.AsciiChar;
+    else if(compareMorseStruct(morseString, length, P, p.morseLength)) currChar = p.AsciiChar;
+    else if(compareMorseStruct(morseString, length, Q, q.morseLength)) currChar = q.AsciiChar;
+    else if(compareMorseStruct(morseString, length, R, r.morseLength)) currChar = r.AsciiChar;
+    else if(compareMorseStruct(morseString, length, S, s.morseLength)) currChar = s.AsciiChar;
+    else if(compareMorseStruct(morseString, length, T, t.morseLength)) currChar = t.AsciiChar;
+    else if(compareMorseStruct(morseString, length, U, u.morseLength)) currChar = u.AsciiChar;
+    else if(compareMorseStruct(morseString, length, V, v.morseLength)) currChar = v.AsciiChar;
+    else if(compareMorseStruct(morseString, length, W, w.morseLength)) currChar = w.AsciiChar;
+    else if(compareMorseStruct(morseString, length, X, x.morseLength)) currChar = x.AsciiChar;
+    else if(compareMorseStruct(morseString, length, Y, y.morseLength)) currChar = y.AsciiChar;
+    else if(compareMorseStruct(morseString, length, Z, z.morseLength)) currChar = z.AsciiChar;
 
-    else if(compareMorseStruct(morseString, length, ZERO, zero.morseLength)) return zero.AsciiChar;
-    else if(compareMorseStruct(morseString, length, ONE, one.morseLength)) return one.AsciiChar;
-    else if(compareMorseStruct(morseString, length, TWO, two.morseLength)) return two.AsciiChar;
-    else if(compareMorseStruct(morseString, length, THREE, three.morseLength)) return three.AsciiChar;
-    else if(compareMorseStruct(morseString, length, FOUR, four.morseLength)) return four.AsciiChar;
-    else if(compareMorseStruct(morseString, length, FIVE, five.morseLength)) return five.AsciiChar;
-    else if(compareMorseStruct(morseString, length, SIX, six.morseLength)) return six.AsciiChar;
-    else if(compareMorseStruct(morseString, length, SEVEN, seven.morseLength)) return seven.AsciiChar;
-    else if(compareMorseStruct(morseString, length, EIGHT, eight.morseLength)) return eight.AsciiChar;
-    else if(compareMorseStruct(morseString, length, NINE, nine.morseLength)) return nine.AsciiChar;
-    else return '?';
+    else if(compareMorseStruct(morseString, length, ZERO, zero.morseLength)) currChar = zero.AsciiChar;
+    else if(compareMorseStruct(morseString, length, ONE, one.morseLength)) currChar = one.AsciiChar;
+    else if(compareMorseStruct(morseString, length, TWO, two.morseLength)) currChar = two.AsciiChar;
+    else if(compareMorseStruct(morseString, length, THREE, three.morseLength)) currChar = three.AsciiChar;
+    else if(compareMorseStruct(morseString, length, FOUR, four.morseLength)) currChar = four.AsciiChar;
+    else if(compareMorseStruct(morseString, length, FIVE, five.morseLength)) currChar = five.AsciiChar;
+    else if(compareMorseStruct(morseString, length, SIX, six.morseLength)) currChar = six.AsciiChar;
+    else if(compareMorseStruct(morseString, length, SEVEN, seven.morseLength)) currChar = seven.AsciiChar;
+    else if(compareMorseStruct(morseString, length, EIGHT, eight.morseLength)) currChar = eight.AsciiChar;
+    else if(compareMorseStruct(morseString, length, NINE, nine.morseLength)) currChar = nine.AsciiChar;
+    else currChar = '?';
+
+    printf("You entered %c\n", currChar);
+
+    if(currentLevel == 0) 
+    {
+        if(currChar == 'E') 
+        {
+            currentLevel = 1;
+            lifeCount = 3;
+            currentCharacter = level01();
+        }
+        else if(currChar == '2')
+        {
+            currentLevel = 2;
+            lifeCount = 3;
+            currentCharacter = level02();
+        }
+        else printf("wrong input");
+    }
+    else
+    {
+        if(currentCharacter == currChar)
+        {
+            correctInARow++;
+            printf("Correct! Current win streak: %i\n", correctInARow);
+            if(correctInARow == 5)
+            {
+                correctInARow = 0;
+                if(currentLevel == 1) currentLevel = 2;
+                if(currentLevel == 2) printf("You Win!");
+            }
+            increaseLifeCount();
+            printf("%i\n", correctInARow);
+            if(currentLevel == 1) currentCharacter = level01();
+            else if (currentLevel == 2) currentCharacter = level02();
+        }
+        else 
+        {
+            lifeCount--;
+            correctInARow = 0;
+            if(lifeCount == 0) printf("You Lost!");
+            else if(lifeCount == 1) printf("Wrong! You lost a life! You have %i life remaining\n", lifeCount);
+            else printf("Wrong! You lost a life! You have %i lives remaining\n", lifeCount);
+        }
+    }
+    clearMorseString();
 }
 
 // Main entry point of the application
 int main() {
+    srand ( time(NULL) );
+    currentLevel = 0;
     morseString = calloc(50, sizeof(char));
     stdio_init_all(); // Initialise all basic IO
 
@@ -174,6 +237,10 @@ int main() {
     printf("██    ██ ██   ██ ██    ██ ██    ██ ██          ██      ██   ██   \n");
     printf(" ██████  ██   ██  ██████   ██████  ██          ███████  █████    \n");
 
+    printf("enter .. for level 1\n");
+    printf("enter -- for level 2\n");
+
+    //char input = readMorseString;
     main_asm(); // Jump into the ASM code
     return 0; // Application return code
 }

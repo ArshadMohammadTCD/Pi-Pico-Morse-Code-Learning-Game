@@ -2,7 +2,7 @@
 add_executable(assign02)
 
 # Specify the source files to be compiled.
-target_sources(assign02 PRIVATE assign02.c assign02.S)
+target_sources(assign02 PRIVATE assign02.c assign02.S assign02.h levels.c)
 
 # Generate the PIO header file from the PIO source file.
 pico_generate_pio_header(assign02 ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)

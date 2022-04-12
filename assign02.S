@@ -34,7 +34,6 @@ main_asm:
     bl    install_gpio_isr    // See below
     ldr   r5, =1              //Boolean variable for checking if its first press
     ldr   r6, =-1             //Initialise time between presses register with -1
-    //ldr   r7, =0              // Counter variable for Morse Memory
 loop:
     wfi                       // Wait here until any interrupt fires
     b     loop                // Always branch back to loop
@@ -185,6 +184,12 @@ terminate_string:
     ldr     r5, =1                                  //Reset first button press variable           
     ldr     r0, =MORSE_MEMORY
     bl      readMorseString
+    @ ldr     r1, =77
+    @ cmp     r0, r1
+    @ beq     level02
+    @ bl      end_morse
+
+    @ bl      level01
 end_morse:
     POP     {pc}
 
