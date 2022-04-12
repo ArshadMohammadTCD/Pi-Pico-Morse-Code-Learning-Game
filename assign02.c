@@ -2,7 +2,13 @@
 #include <stdlib.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
+#include "hardware/pio.h"
 #include "assign02.h"
+#include "ws2812.pio.h"
+
+#define IS_RGBW true        // Will use RGBW format
+#define NUM_PIXELS 1        // There is 1 WS2812 device in the chain
+#define WS2812_PIN 28       // The GPIO pin that the WS2812 connected to
 
 
 // Declare the main assembly code entry point.
@@ -42,6 +48,22 @@ void asm_gpio_set_irq_fall(uint pin) {
 // Enable rising-edge interrupt – see SDK for detail on gpio_set_irq_enabled()
 void asm_gpio_set_irq_rise(uint pin) {
     gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_RISE, true);
+}
+
+static inline void put_pixel(uint32_t pixel_grb) {
+    pio_sm_put_blocking(pio0, 0, pixel_grb << 8u);
+}
+
+static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
+    return  ((uint32_t) (r) << 8)  |
+            ((uint32_t) (g) << 16) |
+            (uint32_t) (b);
+}
+
+void set_led_color(int color) {
+    if(color == 1) put_pixel(urgb_u32(0x7F, 0x00, 0x00)); // red
+    else if (color == 2) put_pixel(urgb_u32(0xFF, 0xAF, 0x00)); // orange
+    else if (color == 3) put_pixel(urgb_u32(0x00, 0x00, 0x7F)); // blue
 }
 
 void morseStringAdd(char characterToAdd)
@@ -116,6 +138,28 @@ char readMorseString()
 int main() {
     morseString = calloc(50, sizeof(char));
     stdio_init_all(); // Initialise all basic IO
+
+    // Initialise the PIO interface with the WS2812 code
+    PIO pio = pio0;
+    uint offset = pio_add_program(pio, &ws2812_program);
+    ws2812_program_init(pio, 0, offset, WS2812_PIN, 800000, IS_RGBW);
+
+    // Do forever...
+    while(true) {
+
+        // Set the color to red at half intensity
+        put_pixel(urgb_u32(0x7F, 0x00, 0x00));
+        sleep_ms(500);
+
+        // Set the color to green at half intensity
+        put_pixel(urgb_u32(0x00, 0x7F, 0x00));
+        sleep_ms(500);
+
+        // Set the color to blue at half intensity
+        put_pixel(urgb_u32(0x00, 0x00, 0x7F));
+        sleep_ms(500);
+
+    }
  
     printf("██     ██ ███████ ██       ██████  ██████  ███    ███ ███████ ██ \n");
     printf("██     ██ ██      ██      ██      ██    ██ ████  ████ ██      ██ \n");
