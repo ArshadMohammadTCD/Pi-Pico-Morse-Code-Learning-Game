@@ -144,3 +144,13 @@ void asm_gpio_set_irq_rise(uint pin);
 void morseStringAdd(char characterToAdd);
 bool compareMorseStruct(char * inputMorse, int inputLength, char * patternMorse, int patternLength);
 void readMorseString();
+
+
+
+
+
+// printf("                   ooooo  oooo   ooooooo   ooooo  oooo    oooo     oooo ooooo oooo   oooo                     ");
+// printf("                     888  88   o888   888o  888    88      88   88  88   888   8888o  88                      ");
+// printf("ooooooooo ooooooooo    888     888     888  888    88       88 888 88    888   88 888o88  ooooooooo ooooooooo ");
+// printf("                       888     888o   o888  888    88        888 888     888   88   8888                      ");
+// printf("                      o888o      88ooo88     888oo88          8   8     o888o o88o    88                      ");
