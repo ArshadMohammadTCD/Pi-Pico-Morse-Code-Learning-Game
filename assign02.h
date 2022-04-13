@@ -89,6 +89,9 @@ int correctInARow;
 int randomArrayIndex;
 int randomNumberOrder[36];
 char currentCharacter;
+int questionsCorrect;
+int questionsIncorrect;
+
 
 char level01();
 char level02();
