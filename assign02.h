@@ -133,6 +133,7 @@ int randomNumberOrder[36];
 char currentCharacter;
 int questionsCorrect;
 int questionsIncorrect;
+float correctPercentage;
 
 char level1and2();
 void changeLifeCount(bool upOrDown);

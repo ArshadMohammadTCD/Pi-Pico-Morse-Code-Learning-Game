@@ -216,6 +216,8 @@ void readMorseString()
     {
         if(currChar == '1') 
         {
+            questionsCorrect = 0;
+            questionsIncorrect = 0;
             set_led_color(3);
             printf("Welcome to level 1\n");
             printf("Ascii characters will appear along with their morse code representation. Enter the correct code to move onto next character\n");
@@ -227,6 +229,8 @@ void readMorseString()
         }
         else if(currChar == '2')
         {
+            questionsCorrect = 0;
+            questionsIncorrect = 0;
             set_led_color(3);
             printf("Welcome to level 2\n");
             printf("Ascii characters will appear without their morse code representation. Enter the correct code to move onto next character\n");
@@ -258,20 +262,40 @@ void readMorseString()
     {
         if(currentCharacter == currChar)
         {
+            questionsCorrect++;
             correctInARow++;
             printf("Correct! Current win streak: %i\n", correctInARow);
             if(correctInARow == 5)
             {
                 correctInARow = 0;
-                if(currentLevel == 1) currentLevel = 2;
-                if(currentLevel == 2) printf("You Win!");
+                if(currentLevel == 1) 
+                {
+                    currentLevel = 2;
+                    printf("Level 1 complete!\n");
+                    printf("Correct answers: %i\n", questionsCorrect);
+                    printf("Incorrect answers: %i\n", questionsIncorrect);
+                    correctPercentage = ((float) questionsCorrect / ( (float) questionsCorrect + (float) questionsIncorrect)) * 100.0;
+                    printf("Percentage correct: %%%i\n", (int) correctPercentage);
+                    questionsCorrect = 0;
+                    questionsIncorrect = 0;
+                }
+                else if(currentLevel == 2) 
+                {
+                    printf("You Win!");
+                    printf("Correct answers: %i\n", questionsCorrect);
+                    printf("Incorrect answers: %i\n", questionsIncorrect);
+                    correctPercentage = ((float) questionsCorrect / ( (float) questionsCorrect + (float) questionsIncorrect)) * 100.0;
+                    printf("Percentage correct: %%%i", (int) correctPercentage);
+                    questionsCorrect = 0;
+                    questionsIncorrect = 0;
+                }
             }
             changeLifeCount(1);
             if(currentLevel == 1) 
             {
                 currentCharacter = level1and2();
                 char * morseRepresentation = findMorseCode();
-                printf("Its morse code represenation is %s\n", morseRepresentation);
+                printf("Its morse code represenation is %s\n\n", morseRepresentation);
             }
             else if (currentLevel == 2) 
             {
@@ -280,9 +304,19 @@ void readMorseString()
         }
         else 
         {
+            questionsIncorrect++;
             changeLifeCount(0);
             correctInARow = 0;
-            if(lifeCount == 0) printf("You Lost!");
+            if(lifeCount == 0) 
+            {
+                printf("You Lost!\n");
+                printf("Correct answers: %i\n", questionsCorrect);
+                printf("Incorrect answers: %i\n", questionsIncorrect);
+                correctPercentage = ((float) questionsCorrect / ( (float) questionsCorrect + (float) questionsIncorrect)) * 100.0;
+                printf("Percentage correct: %%%i", (int) correctPercentage);
+                questionsCorrect = 0;
+                questionsIncorrect = 0;
+            }
             else if(lifeCount == 1) printf("Wrong! You lost a life! You have %i life remaining\n", lifeCount);
             else printf("Wrong! You lost a life! You have %i lives remaining\n", lifeCount);
         }
