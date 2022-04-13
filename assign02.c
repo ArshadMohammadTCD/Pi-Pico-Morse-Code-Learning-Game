@@ -236,9 +236,14 @@ int main() {
     printf("██   ███ ██████  ██    ██ ██    ██ ██████       █████   █████    \n");
     printf("██    ██ ██   ██ ██    ██ ██    ██ ██          ██      ██   ██   \n");
     printf(" ██████  ██   ██  ██████   ██████  ██          ███████  █████    \n");
-
-    printf("enter .. for level 1\n");
-    printf("enter -- for level 2\n");
+    printf("\nHow to Play:\n");
+    printf("You will be presented with an alphanumeric character (A-Z/0-9)\n");
+	printf("Enter the correct equivalent Morse Code sequence to progress!\n");
+	printf("Choose a Level:\n");
+	printf("Level 1: Morse Code equivalent shown\n");
+	printf("Level 2: Morse Code equivalent not shown\n");
+    printf("Enter .. for Level 1\n");
+    printf("Enter -- for Level 2\n");
 
     //char input = readMorseString;
     main_asm(); // Jump into the ASM code
