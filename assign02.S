@@ -218,9 +218,11 @@ its_a_dot:
     b       end_morse
 
 input_space:
+    movs    r4, r0
     ldr     r0, =32                                 //ASCII code for a space
     bl      morseStringAdd 
-    bl      set_alarm                              
+    bl      set_alarm 
+    movs    r0, r4                             
     b       dot_or_dash
 
 end_morse:
