@@ -34,6 +34,7 @@
 main_asm:
     bl    init_btns           // Use asm_gpio_set_irq C function to setup falling-edge interrupts
     bl    install_gpio_isr    // See below
+    bl    install_alrm_isr
     ldr   r5, =1              //Boolean variable for checking if its first press
     ldr   r6, =-1             //Initialise time between presses register with -1
 loop:
@@ -60,6 +61,27 @@ install_gpio_isr:
     str     r0, [r2] 
     bx      lr                                              //Exit subroutine
     
+    //
+// Sets up the alrm_isr in the RAM vector table and enables the correct interrupt
+//
+install_alrm_isr:
+    ldr     r2, =(PPB_BASE + M0PLUS_VTOR_OFFSET)        @ Get the address of the RAM vector table using the (PPB_BASE + M0PLUS_VTOR_OFFSET) register
+    ldr     r1, [r2]                                
+    ldr     r2, =ALRM_ISR_OFFSET                        @ Load r2 with the correct offset for ALARM0 in the vector table
+    adds    r2, r1                                      @ Add the offset to the value in r1. r2 now contains the address of the ALARM ISR
+    ldr     r0, =alrm_isr                               @ Load r0 with the address of the alrm_isr handler
+    str     r0, [r2]                                    @ Store the value in r0 at the address of r2 in memory, this activates the SVC ISR
+
+    ldr     r2, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)   @ Disable the ALARM0 IRQ by writing the correct value to (PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
+    movs    r0, #1
+    str     r0, [r2]
+
+    ldr     r2, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)   @ Enable the ALARM0 IRQ by writing the correct value to (PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
+    movs    r0, #1
+    str     r0, [r2]
+
+    bx      lr                                          @ Exit subroutine
+
 //
 // Service the pending interrupt from the GPIO
 //
@@ -88,9 +110,10 @@ gpio_isr:
 // Enable alarm timer interrupts and set an alarm
 //
 set_alarm:
-    PUSH    {lr}
+    PUSH    {r6, lr}
 
     movs    r0, #1
+    ldr     r6, =DFLT_ALARM_TIME
     ldr     r2, =(TIMER_BASE + TIMER_INTE_OFFSET)   @ Enable alarm timer interrupts using the (TIMER_BASE + TIMER_INTE_OFFSET) register 
     str     r0, [r2]                                
     ldr     r2, =(TIMER_BASE + TIMER_TIMELR_OFFSET) @ Get the current timer count from (TIMER_BASE + TIMER_TIMELR_OFFSET) register
@@ -99,7 +122,9 @@ set_alarm:
     ldr     r2, =(TIMER_BASE + TIMER_ALARM0_OFFSET)
     str     r0, [r2]                                @ Push the updated value to (TIMER_BASE + TIMER_ALARM0_OFFSET)
 
-    POP     {pc}                                    @ Exit subroutine
+    @ ldr     r0, =upbtnmsg
+    @ bl      printf
+    POP     {r6, pc}                                    @ Exit subroutine
 //
 // Service the pending interrupt from the ALARM0 TIMER
 //
@@ -117,6 +142,8 @@ alrm_isr:
     movs    r0, #1
     str     r0, [r2]                    @ Disable pending interrupt from TIMER by writing correct value to (TIMER_BASE + TIMER_INTR_OFFSET)
 
+    @ ldr     r0, =downbtnmsg
+    @ bl      printf
     POP     {pc}                        @ Exit ISR
 
 
@@ -169,9 +196,6 @@ morse_writer:
     cmp     r6, r2                                  //Check if this is the first press by reading r11 register
     beq     dot_or_dash                             //If so next input will be a dot or dash, can't be a space
 
-    ldr     r2, =TWO_SECONDS
-    cmp     r6, r2 
-    bge     terminate_string
     ldr     r2, =ONE_SECOND                         
     cmp     r6, r2 
     bge     input_space
@@ -183,32 +207,22 @@ dot_or_dash:
 
     ldr     r0, =45    
     bl      morseStringAdd                          //ASCII code for a hyphen
+    bl      set_alarm
     b       end_morse
 
 
 its_a_dot:
     ldr     r0, =46                                 //ASCII code for a period
     bl      morseStringAdd
+    bl      set_alarm
     b       end_morse
 
 input_space:
     ldr     r0, =32                                 //ASCII code for a space
-    bl      morseStringAdd                               
+    bl      morseStringAdd 
+    bl      set_alarm                              
     b       dot_or_dash
 
-terminate_string:
-    ldr     r0, =0                                  //ASCII code for null terminating character
-    bl      morseStringAdd                         
-    ldr     r6, =-1                                 //Reset time between presses to -1                             
-    ldr     r5, =1                                  //Reset first button press variable           
-    ldr     r0, =MORSE_MEMORY
-    bl      readMorseString
-    @ ldr     r1, =77
-    @ cmp     r0, r1
-    @ beq     level02
-    @ bl      end_morse
-
-    @ bl      level01
 end_morse:
     POP     {pc}
 
@@ -220,5 +234,7 @@ main_loop:
  .align 4
 
 .data
+downbtnmsg: .asciz "Alarm firing"
+upbtnmsg: .asciz "Alarm setting"
 lstate: .word DFLT_STATE_STRT
 ltimer: .word DFLT_ALARM_TIME
