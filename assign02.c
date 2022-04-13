@@ -220,7 +220,7 @@ void readMorseString()
             questionsIncorrect = 0;
             set_led_color(3);
             printf("Welcome to level 1\n");
-            printf("Ascii characters will appear along with their morse codes. Enter the correct code to move onto next character\n");
+            printf("Ascii characters will appear along with their morse code representation. Enter the correct code to move onto next character\n");
             currentLevel = 1;
             lifeCount = 3;
             currentCharacter = level1and2();
@@ -233,10 +233,28 @@ void readMorseString()
             questionsIncorrect = 0;
             set_led_color(3);
             printf("Welcome to level 2\n");
-            printf("Ascii characters will appear without their morse codes. Enter the correct code to move onto next character\n");
+            printf("Ascii characters will appear without their morse code representation. Enter the correct code to move onto next character\n");
             currentLevel = 2;
             lifeCount = 3;
             currentCharacter = level1and2();
+        }
+        else if(currChar == '3')
+        {
+            set_led_color(3);
+            printf("Welcome to level 3\n");
+            printf("Ascii words will appear with their morse code representation. Enter the correct code to move onto the next word\n");
+            currentLevel = 3;
+            lifeCount = 3;
+            //currentCharacter = level03();
+        }
+        else if(currChar == '4')
+        {
+            set_led_color(3);
+            printf("Welcome to level 4\n");
+            printf("Ascii words will appear without their morse code representation. Enter the correct code to move onto the next word\n");
+            currentLevel = 4;
+            lifeCount = 3;
+            //currentCharacter = level02();
         }
         else printf("wrong input\n");
     }
@@ -342,7 +360,9 @@ int main() {
 	printf("Enter the correct equivalent Morse Code sequence to progress!\n");
 	printf("Choose a Level:\n");
 	printf(".---- Level 1: Morse Code equivalent shown\n");
-	printf("..--- Level 2: Morse Code equivalent not shown\n\n");
+	printf("..--- Level 2: Morse Code equivalent not shown\n");
+    printf("...-- Level 3: Morse Code equivalent shown\n");
+	printf("....- Level 4: Morse Code equivalent not shown\n\n");
 
     //char input = readMorseString;
     main_asm(); // Jump into the ASM code

@@ -5,126 +5,262 @@
 
 char level1and2()
 {
-    char currChar;
+    char currWord;
     int randomIndex = rand() % 36;
 
     switch(randomIndex) 
         {
             case 0:
-                currChar = 'A';
+                currWord = 'A';
                 break;
             case 1:
-                currChar = 'B';
+                currWord = 'B';
                 break;
             case 2:
-                currChar = 'C';
+                currWord = 'C';
                 break;
             case 3:
-                currChar = 'D';
+                currWord = 'D';
                 break;
             case 4:
-                currChar = 'E';
+                currWord = 'E';
                 break;
             case 5:
-                currChar = 'F';
+                currWord = 'F';
                 break;
             case 6:
-                currChar = 'G';
+                currWord = 'G';
                 break;
             case 7:
-                currChar = 'H';
+                currWord = 'H';
                 break;
             case 8:
-                currChar = 'I';
+                currWord = 'I';
                 break;
             case 9:
-                currChar = 'J';
+                currWord = 'J';
                 break;
             case 10:
-                currChar = 'K';
+                currWord = 'K';
                 break;
             case 11:
-                currChar = 'L';
+                currWord = 'L';
                 break;
             case 12:
-                currChar = 'M';
+                currWord = 'M';
                 break;
             case 13:
-                currChar = 'N';
+                currWord = 'N';
                 break;
             case 14:
-                currChar = 'O';
+                currWord = 'O';
                 break;
             case 15:
-                currChar = 'P';
+                currWord = 'P';
                 break;
             case 16:
-                currChar = 'Q';
+                currWord = 'Q';
                 break;
             case 17:
-                currChar = 'R';
+                currWord = 'R';
                 break;
             case 18:
-                currChar = 'S';
+                currWord = 'S';
                 break;
             case 19:    
-                currChar = 'T';
+                currWord = 'T';
                 break;
             case 20:
-                currChar = 'U';
+                currWord = 'U';
                 break;
             case 21:
-                currChar = 'V';
+                currWord = 'V';
                 break;
             case 22:
-                currChar = 'W';
+                currWord = 'W';
                 break;
             case 23:
-                currChar = 'X';
+                currWord = 'X';
                 break;
             case 24:
-                currChar = 'Y';
+                currWord = 'Y';
                 break;
             case 25:
-                currChar = 'Z';
+                currWord = 'Z';
                 break;
             case 26:
-                currChar = '0';
+                currWord = '0';
                 break;
             case 27:
-                currChar = '1';
+                currWord = '1';
                 break;
             case 28:
-                currChar = '2';
+                currWord = '2';
                 break;
             case 29:
-                currChar = '3';
+                currWord = '3';
                 break;
             case 30:
-                currChar = '4';
+                currWord = '4';
                 break;
             case 31:
-                currChar = '5';
+                currWord = '5';
                 break;
             case 32:
-                currChar = '6';
+                currWord = '6';
                 break;
             case 33:
-                currChar = '7';
+                currWord = '7';
                 break;
             case 34:
-                currChar = '8';
+                currWord = '8';
                 break;
             case 35:
-                currChar = '9';
+                currWord = '9';
                 break;
             default:
-                currChar = '?';
+                currWord = '?';
                 printf("Invalid number");
         }
-    printf("The next character is %c\n", currChar);
-    return currChar;
+    printf("The next character is %c\n", currWord);
+    return currWord;
 }
+
+char * level3and4()
+{
+    char * currWord;
+    int randomIndex = rand() % 40;
+
+    switch(randomIndex) 
+        {
+            case 0:
+                currWord = 'GORILLA';
+                break;
+            case 1:
+                currWord = 'SPINNER';
+                break;
+            case 2:
+                currWord = 'RODENT';
+                break;
+            case 3:
+                currWord = 'MOTHER';
+                break;
+            case 4:
+                currWord = 'HOUSE';
+                break;
+            case 5:
+                currWord = 'BADMINTON';
+                break;
+            case 6:
+                currWord = 'LEAGUE';
+                break;
+            case 7:
+                currWord = 'ALARM';
+                break;
+            case 8:
+                currWord = 'PARK';
+                break;
+            case 9:
+                currWord = 'RUN';
+                break;
+            case 10:
+                currWord = 'SIT';
+                break;
+            case 11:
+                currWord = 'CHAIR';
+                break;
+            case 12:
+                currWord = 'PICO';
+                break;
+            case 13:
+                currWord = 'PI';
+                break;
+            case 14:
+                currWord = 'MICROPROCESSOR';
+                break;
+            case 15:
+                currWord = 'DISCORD';
+                break;
+            case 16:
+                currWord = 'VSCODE';
+                break;
+            case 17:
+                currWord = 'LIFTING';
+                break;
+            case 18:
+                currWord = 'SQUAT';
+                break;
+            case 19:    
+                currWord = 'DEADLIFT';
+                break;
+            case 20:
+                currWord = 'DOG';
+                break;
+            case 21:
+                currWord = 'CAT';
+                break;
+            case 22:
+                currWord = 'FISH';
+                break;
+            case 23:
+                currWord = 'BROTHER';
+                break;
+            case 24:
+                currWord = 'DAD';
+                break;
+            case 25:
+                currWord = 'IRELAND';
+                break;
+            case 26:
+                currWord = 'TRINITY';
+                break;
+            case 27:
+                currWord = 'JAMIE';
+                break;
+            case 28:
+                currWord = 'TOM';
+                break;
+            case 29:
+                currWord = 'ARSHAD';
+                break;
+            case 30:
+                currWord = 'AMMAR';
+                break;
+            case 31:
+                currWord = 'KEVIN';
+                break;
+            case 32:
+                currWord = 'COLLEGE';
+                break;
+            case 33:
+                currWord = 'COW';
+                break;
+            case 34:
+                currWord = 'POT';
+                break;
+            case 35:
+                currWord = 'CLAY';
+                break;
+            case 36:
+                currWord = 'PC';
+                break;
+            case 37:
+                currWord = 'MOUSE';
+                break;
+            case 38:
+                currWord = 'MONKEY';
+                break;
+            case 39:
+                currWord = 'JOSH';
+                break;
+            default:
+                currWord = '?';
+                printf("Invalid number");
+        }
+    printf("The next character is %c\n", currWord);
+    return currWord;
+}
+
 
 
     
