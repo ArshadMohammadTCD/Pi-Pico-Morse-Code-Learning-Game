@@ -21,6 +21,9 @@
 .equ ONE_SECOND, 500000     //Approximate time for one second
 .equ TWO_SECONDS, 1000000   //Approximate time for two seconds
 
+.equ ALRM_ISR_OFFSET, 0x40      @ ALARM0 is int #0 (vector table entry 16)
+.equ DFLT_ALARM_TIME, 2000000   @ Specify the default alarm timeout
+
 .equ MORSE_MEMORY, 0x10000010   //Address where the morse string will be stored
 
 
@@ -29,7 +32,6 @@
 // Main entry point into the ASM portion of the code
 //
 main_asm:
-    bl    init_leds           // Same as previous labs
     bl    init_btns           // Use asm_gpio_set_irq C function to setup falling-edge interrupts
     bl    install_gpio_isr    // See below
     ldr   r5, =1              //Boolean variable for checking if its first press
@@ -37,11 +39,6 @@ main_asm:
 loop:
     wfi                       // Wait here until any interrupt fires
     b     loop                // Always branch back to loop
-    
-
-//
-// Service the pending interrupt from the ALARM0 TIMER
-//
 
 //
 // Sets up the gpio_isr in the RAM vector table and enables the correct interrupt
@@ -87,6 +84,42 @@ gpio_isr:
     ldr     r0, =GPIO_BTN_RISE_MSK
     b       end
 
+//
+// Enable alarm timer interrupts and set an alarm
+//
+set_alarm:
+    PUSH    {lr}
+
+    movs    r0, #1
+    ldr     r2, =(TIMER_BASE + TIMER_INTE_OFFSET)   @ Enable alarm timer interrupts using the (TIMER_BASE + TIMER_INTE_OFFSET) register 
+    str     r0, [r2]                                
+    ldr     r2, =(TIMER_BASE + TIMER_TIMELR_OFFSET) @ Get the current timer count from (TIMER_BASE + TIMER_TIMELR_OFFSET) register
+    ldr     r0, [r2]
+    adds    r0, r0, r6                              @ Add the time delay you want to wait for to the current timer count
+    ldr     r2, =(TIMER_BASE + TIMER_ALARM0_OFFSET)
+    str     r0, [r2]                                @ Push the updated value to (TIMER_BASE + TIMER_ALARM0_OFFSET)
+
+    POP     {pc}                                    @ Exit subroutine
+//
+// Service the pending interrupt from the ALARM0 TIMER
+//
+.thumb_func
+alrm_isr:
+    PUSH    {lr} 
+    // Terminate string and branch to read morse string after 2 seconds
+    ldr     r0, =0                                  //ASCII code for null terminating character
+    bl      morseStringAdd                         
+    ldr     r6, =-1                                 //Reset time between presses to -1                             
+    ldr     r5, =1                                  //Reset first button press variable           
+    ldr     r0, =MORSE_MEMORY
+    bl      readMorseString
+    ldr     r2, =(TIMER_BASE + TIMER_INTR_OFFSET)
+    movs    r0, #1
+    str     r0, [r2]                    @ Disable pending interrupt from TIMER by writing correct value to (TIMER_BASE + TIMER_INTR_OFFSET)
+
+    POP     {pc}                        @ Exit ISR
+
+
 
 begin_timer:
     ldr     r4, =(TIMER_BASE + TIMER_TIMELR_OFFSET)         //Get the current timer count from (TIMER_BASE + TIMER_TIMELR_OFFSET) register
@@ -105,20 +138,6 @@ end:
     ldr     r2, =(IO_BANK0_BASE + IO_BANK0_INTR2_OFFSET)
     str     r0, [r2]                                        //Acknowledge whatever interrupt was called by one of the three buttons
     POP     {pc}
-
-
-
-
-init_leds:
-    PUSH    {lr}
-    movs    r0, #GPIO_LED_PIN            // This value is the GPIO LED pin on the PI PICO board
-    bl      asm_gpio_init                // Initialise the GPIO LED pin
-                                    
-    movs    r0, #GPIO_LED_PIN            
-    movs    r1, #GPIO_DIR_OUT            // We want this GPIO pin to be setup as an output pin
-    bl      asm_gpio_set_dir             // Specify the GPIO pin as an output pin
-    POP     {pc}
-
 
 
 
