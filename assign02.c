@@ -6,6 +6,7 @@
 #include "assign02.h"
 #include <time.h>
 #include "ws2812.pio.h"
+#include "hardware/watchdog.h"
 
 #define IS_RGBW true        // Will use RGBW format
 #define NUM_PIXELS 1        // There is 1 WS2812 device in the chain
@@ -48,6 +49,11 @@ void asm_gpio_set_irq_fall(uint pin) {
 // Enable rising-edge interrupt – see SDK for detail on gpio_set_irq_enabled()
 void asm_gpio_set_irq_rise(uint pin) {
     gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_RISE, true);
+}
+
+//Loads the watchdog timer again after the specified time has passed
+void watchdog_update_asm(){
+    watchdog_update();
 }
 
 static inline void put_pixel(uint32_t pixel_grb) {
@@ -154,6 +160,8 @@ char * findMorseCode()
 //This function checks what character the input morse string represents, and returns that character if there is a match. Else it returns the space character
 void readMorseString()
 {
+    watchdog_enable(0x2328, 1);
+
     printf("\n\n");               //skip line from morse adding
     char currChar = morseString[0];
     int length = 0;
@@ -162,7 +170,7 @@ void readMorseString()
         currChar = morseString[i];
         length++;
     }
-
+    
     if(compareMorseStruct(morseString, length, A, a.morseLength)) currChar = a.AsciiChar;
     else if(compareMorseStruct(morseString, length, B, b.morseLength)) currChar = b.AsciiChar;
     else if(compareMorseStruct(morseString, length, C, c.morseLength)) currChar = c.AsciiChar;
@@ -270,6 +278,11 @@ int main() {
     currentLevel = 0;
     morseString = calloc(50, sizeof(char));
     stdio_init_all(); // Initialise all basic IO
+
+    //Resets the game if 9 seconds pass
+    if (watchdog_caused_reboot()) {
+        printf("Time out! Game has been reset" \n\n);
+    }
 
     // Initialise the PIO interface with the WS2812 code
     PIO pio = pio0;
