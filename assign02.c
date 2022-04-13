@@ -281,7 +281,7 @@ int main() {
 
     //Resets the game if 9 seconds pass
     if (watchdog_caused_reboot()) {
-        printf("Time out! Game has been reset");
+        printf("Time out! Game has been reset" \n\n);
     }
 
     // Initialise the PIO interface with the WS2812 code
