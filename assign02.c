@@ -97,6 +97,47 @@ void increaseLifeCount()
     if(lifeCount < 3) lifeCount++;
 }
 
+char * findMorseCode()
+{
+    if(a.AsciiChar == currentCharacter) return A;
+    if(b.AsciiChar == currentCharacter) return B;
+    if(c.AsciiChar == currentCharacter) return C;
+    if(d.AsciiChar == currentCharacter) return D;
+    if(e.AsciiChar == currentCharacter) return E;
+    if(f.AsciiChar == currentCharacter) return F;
+    if(g.AsciiChar == currentCharacter) return G;
+    if(h.AsciiChar == currentCharacter) return H;
+    if(i.AsciiChar == currentCharacter) return I;
+    if(j.AsciiChar == currentCharacter) return J;
+    if(k.AsciiChar == currentCharacter) return K;
+    if(l.AsciiChar == currentCharacter) return L;
+    if(m.AsciiChar == currentCharacter) return M;
+    if(n.AsciiChar == currentCharacter) return N;
+    if(o.AsciiChar == currentCharacter) return O;
+    if(p.AsciiChar == currentCharacter) return P;
+    if(q.AsciiChar == currentCharacter) return Q;
+    if(r.AsciiChar == currentCharacter) return R;
+    if(s.AsciiChar == currentCharacter) return S;
+    if(t.AsciiChar == currentCharacter) return T;
+    if(u.AsciiChar == currentCharacter) return U;
+    if(v.AsciiChar == currentCharacter) return V;
+    if(w.AsciiChar == currentCharacter) return W;
+    if(x.AsciiChar == currentCharacter) return X;
+    if(y.AsciiChar == currentCharacter) return Y;
+    if(z.AsciiChar == currentCharacter) return Z;
+
+    if(zero.AsciiChar == currentCharacter) return ZERO;
+    if(one.AsciiChar == currentCharacter) return ONE;
+    if(two.AsciiChar == currentCharacter) return TWO;
+    if(three.AsciiChar == currentCharacter) return THREE;
+    if(four.AsciiChar == currentCharacter) return FOUR;
+    if(five.AsciiChar == currentCharacter) return FIVE;
+    if(six.AsciiChar == currentCharacter) return SIX;
+    if(seven.AsciiChar == currentCharacter) return SEVEN;
+    if(eight.AsciiChar == currentCharacter) return EIGHT;
+    if(nine.AsciiChar == currentCharacter) return NINE;
+}
+
 //This function checks what character the input morse string represents, and returns that character if there is a match. Else it returns the space character
 void readMorseString()
 {
