@@ -221,7 +221,7 @@ void readMorseString()
             printf("Ascii characters will appear along with their morse codes. Enter the correct code to move onto next character\n");
             currentLevel = 1;
             lifeCount = 3;
-            currentCharacter = level01();
+            currentCharacter = level1and2();
             char * morseRepresentation = findMorseCode();
             printf("Its morse code represenation is %s\n\n", morseRepresentation);
         }
@@ -232,7 +232,7 @@ void readMorseString()
             printf("Ascii characters will appear without their morse codes. Enter the correct code to move onto next character\n");
             currentLevel = 2;
             lifeCount = 3;
-            currentCharacter = level02();
+            currentCharacter = level1and2();
         }
         else printf("wrong input\n");
     }
@@ -251,13 +251,13 @@ void readMorseString()
             changeLifeCount(1);
             if(currentLevel == 1) 
             {
-                currentCharacter = level01();
+                currentCharacter = level1and2();
                 char * morseRepresentation = findMorseCode();
                 printf("Its morse code represenation is %s\n", morseRepresentation);
             }
             else if (currentLevel == 2) 
             {
-                currentCharacter = level02();
+                currentCharacter = level1and2();
             }
         }
         else 
