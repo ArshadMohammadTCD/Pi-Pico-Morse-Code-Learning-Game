@@ -21,6 +21,9 @@
 .equ ONE_SECOND, 500000     //Approximate time for one second
 .equ TWO_SECONDS, 1000000   //Approximate time for two seconds
 
+.equ ALRM_ISR_OFFSET, 0x40      @ ALARM0 is int #0 (vector table entry 16)
+.equ DFLT_ALARM_TIME, 2000000   @ Specify the default alarm timeout
+
 .equ MORSE_MEMORY, 0x10000010   //Address where the morse string will be stored
 
 
@@ -29,19 +32,14 @@
 // Main entry point into the ASM portion of the code
 //
 main_asm:
-    bl    init_leds           // Same as previous labs
     bl    init_btns           // Use asm_gpio_set_irq C function to setup falling-edge interrupts
     bl    install_gpio_isr    // See below
+    bl    install_alrm_isr
     ldr   r5, =1              //Boolean variable for checking if its first press
     ldr   r6, =-1             //Initialise time between presses register with -1
 loop:
     wfi                       // Wait here until any interrupt fires
     b     loop                // Always branch back to loop
-    
-
-//
-// Service the pending interrupt from the ALARM0 TIMER
-//
 
 //
 // Sets up the gpio_isr in the RAM vector table and enables the correct interrupt
@@ -63,12 +61,34 @@ install_gpio_isr:
     str     r0, [r2] 
     bx      lr                                              //Exit subroutine
     
+    //
+// Sets up the alrm_isr in the RAM vector table and enables the correct interrupt
+//
+install_alrm_isr:
+    ldr     r2, =(PPB_BASE + M0PLUS_VTOR_OFFSET)        @ Get the address of the RAM vector table using the (PPB_BASE + M0PLUS_VTOR_OFFSET) register
+    ldr     r1, [r2]                                
+    ldr     r2, =ALRM_ISR_OFFSET                        @ Load r2 with the correct offset for ALARM0 in the vector table
+    adds    r2, r1                                      @ Add the offset to the value in r1. r2 now contains the address of the ALARM ISR
+    ldr     r0, =alrm_isr                               @ Load r0 with the address of the alrm_isr handler
+    str     r0, [r2]                                    @ Store the value in r0 at the address of r2 in memory, this activates the SVC ISR
+
+    ldr     r2, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)   @ Disable the ALARM0 IRQ by writing the correct value to (PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
+    movs    r0, #1
+    str     r0, [r2]
+
+    ldr     r2, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)   @ Enable the ALARM0 IRQ by writing the correct value to (PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
+    movs    r0, #1
+    str     r0, [r2]
+
+    bx      lr                                          @ Exit subroutine
+
 //
 // Service the pending interrupt from the GPIO
 //
 .thumb_func
 gpio_isr:
     PUSH    {lr}
+    bl      watchdog_update_asm
     ldr     r1, =(IO_BANK0_BASE + IO_BANK0_PROC0_INTS2_OFFSET)      
     ldr     r0, [r1]
     ldr     r1, =GPIO_BTN_FALL_MSK                                        
@@ -86,6 +106,47 @@ gpio_isr:
     ldr     r7, [r7]
     ldr     r0, =GPIO_BTN_RISE_MSK
     b       end
+
+//
+// Enable alarm timer interrupts and set an alarm
+//
+set_alarm:
+    PUSH    {r6, lr}
+
+    movs    r0, #1
+    ldr     r6, =DFLT_ALARM_TIME
+    ldr     r2, =(TIMER_BASE + TIMER_INTE_OFFSET)   @ Enable alarm timer interrupts using the (TIMER_BASE + TIMER_INTE_OFFSET) register 
+    str     r0, [r2]                                
+    ldr     r2, =(TIMER_BASE + TIMER_TIMELR_OFFSET) @ Get the current timer count from (TIMER_BASE + TIMER_TIMELR_OFFSET) register
+    ldr     r0, [r2]
+    adds    r0, r0, r6                              @ Add the time delay you want to wait for to the current timer count
+    ldr     r2, =(TIMER_BASE + TIMER_ALARM0_OFFSET)
+    str     r0, [r2]                                @ Push the updated value to (TIMER_BASE + TIMER_ALARM0_OFFSET)
+
+    @ ldr     r0, =upbtnmsg
+    @ bl      printf
+    POP     {r6, pc}                                    @ Exit subroutine
+//
+// Service the pending interrupt from the ALARM0 TIMER
+//
+.thumb_func
+alrm_isr:
+    PUSH    {lr} 
+    // Terminate string and branch to read morse string after 2 seconds
+    ldr     r0, =0                                  //ASCII code for null terminating character
+    bl      morseStringAdd                         
+    ldr     r6, =-1                                 //Reset time between presses to -1                             
+    ldr     r5, =1                                  //Reset first button press variable           
+    ldr     r0, =MORSE_MEMORY
+    bl      readMorseString
+    ldr     r2, =(TIMER_BASE + TIMER_INTR_OFFSET)
+    movs    r0, #1
+    str     r0, [r2]                    @ Disable pending interrupt from TIMER by writing correct value to (TIMER_BASE + TIMER_INTR_OFFSET)
+
+    @ ldr     r0, =downbtnmsg
+    @ bl      printf
+    POP     {pc}                        @ Exit ISR
+
 
 
 begin_timer:
@@ -105,20 +166,6 @@ end:
     ldr     r2, =(IO_BANK0_BASE + IO_BANK0_INTR2_OFFSET)
     str     r0, [r2]                                        //Acknowledge whatever interrupt was called by one of the three buttons
     POP     {pc}
-
-
-
-
-init_leds:
-    PUSH    {lr}
-    movs    r0, #GPIO_LED_PIN            // This value is the GPIO LED pin on the PI PICO board
-    bl      asm_gpio_init                // Initialise the GPIO LED pin
-                                    
-    movs    r0, #GPIO_LED_PIN            
-    movs    r1, #GPIO_DIR_OUT            // We want this GPIO pin to be setup as an output pin
-    bl      asm_gpio_set_dir             // Specify the GPIO pin as an output pin
-    POP     {pc}
-
 
 
 
@@ -150,9 +197,6 @@ morse_writer:
     cmp     r6, r2                                  //Check if this is the first press by reading r11 register
     beq     dot_or_dash                             //If so next input will be a dot or dash, can't be a space
 
-    ldr     r2, =TWO_SECONDS
-    cmp     r6, r2 
-    bge     terminate_string
     ldr     r2, =ONE_SECOND                         
     cmp     r6, r2 
     bge     input_space
@@ -164,32 +208,24 @@ dot_or_dash:
 
     ldr     r0, =45    
     bl      morseStringAdd                          //ASCII code for a hyphen
+    bl      set_alarm
     b       end_morse
 
 
 its_a_dot:
     ldr     r0, =46                                 //ASCII code for a period
     bl      morseStringAdd
+    bl      set_alarm
     b       end_morse
 
 input_space:
+    movs    r4, r0
     ldr     r0, =32                                 //ASCII code for a space
-    bl      morseStringAdd                               
+    bl      morseStringAdd 
+    bl      set_alarm 
+    movs    r0, r4                             
     b       dot_or_dash
 
-terminate_string:
-    ldr     r0, =0                                  //ASCII code for null terminating character
-    bl      morseStringAdd                         
-    ldr     r6, =-1                                 //Reset time between presses to -1                             
-    ldr     r5, =1                                  //Reset first button press variable           
-    ldr     r0, =MORSE_MEMORY
-    bl      readMorseString
-    @ ldr     r1, =77
-    @ cmp     r0, r1
-    @ beq     level02
-    @ bl      end_morse
-
-    @ bl      level01
 end_morse:
     POP     {pc}
 
@@ -201,5 +237,7 @@ main_loop:
  .align 4
 
 .data
+downbtnmsg: .asciz "Alarm firing"
+upbtnmsg: .asciz "Alarm setting"
 lstate: .word DFLT_STATE_STRT
 ltimer: .word DFLT_ALARM_TIME

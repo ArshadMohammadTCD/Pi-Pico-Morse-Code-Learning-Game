@@ -131,6 +131,8 @@ int correctInARow;
 int randomArrayIndex;
 int randomNumberOrder[36];
 char currentCharacter;
+int questionsCorrect;
+int questionsIncorrect;
 
 char level1and2();
 void changeLifeCount(bool upOrDown);
