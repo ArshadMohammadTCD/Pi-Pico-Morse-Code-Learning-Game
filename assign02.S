@@ -88,6 +88,7 @@ install_alrm_isr:
 .thumb_func
 gpio_isr:
     PUSH    {lr}
+    bl      watchdog_update_asm
     ldr     r1, =(IO_BANK0_BASE + IO_BANK0_PROC0_INTS2_OFFSET)      
     ldr     r0, [r1]
     ldr     r1, =GPIO_BTN_FALL_MSK                                        
