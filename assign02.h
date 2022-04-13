@@ -90,8 +90,7 @@ int randomArrayIndex;
 int randomNumberOrder[36];
 char currentCharacter;
 
-char level01();
-char level02();
+char level1and2();
 void changeLifeCount(bool upOrDown);
 
 void asm_gpio_init(uint pin);
