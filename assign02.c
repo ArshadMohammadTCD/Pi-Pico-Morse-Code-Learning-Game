@@ -63,7 +63,8 @@ static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
 void set_led_color(int color) {
     if(color == 1) put_pixel(urgb_u32(0x7F, 0x00, 0x00)); // red
     else if (color == 2) put_pixel(urgb_u32(0xFF, 0xAF, 0x00)); // orange
-    else if (color == 3) put_pixel(urgb_u32(0x00, 0x00, 0x7F)); // blue
+    else if (color == 3) put_pixel(urgb_u32(0x00, 0x7F, 0x00)); // green
+    else if (color == 4) put_pixel(urgb_u32(0x00, 0x00, 0x7F)); // blue
 }
 
 void morseStringAdd(char characterToAdd)
@@ -92,56 +93,68 @@ void clearMorseString()
     morseStringIndex = 0;
 }
 
-void increaseLifeCount()
+void changeLifeCount(bool upOrDown)
 {
-    if(lifeCount < 3) lifeCount++;
+    if(upOrDown)
+    {
+        if(lifeCount < 3) lifeCount++;
+    }
+    else 
+    {
+        if(lifeCount > 0) lifeCount--;
+    }
+    
+    if(lifeCount == 3) set_led_color(3);
+    else if(lifeCount == 2) set_led_color(2);
+    else set_led_color(1);
 }
 
 char * findMorseCode()
 {
     if(a.AsciiChar == currentCharacter) return A;
-    if(b.AsciiChar == currentCharacter) return B;
-    if(c.AsciiChar == currentCharacter) return C;
-    if(d.AsciiChar == currentCharacter) return D;
-    if(e.AsciiChar == currentCharacter) return E;
-    if(f.AsciiChar == currentCharacter) return F;
-    if(g.AsciiChar == currentCharacter) return G;
-    if(h.AsciiChar == currentCharacter) return H;
-    if(i.AsciiChar == currentCharacter) return I;
-    if(j.AsciiChar == currentCharacter) return J;
-    if(k.AsciiChar == currentCharacter) return K;
-    if(l.AsciiChar == currentCharacter) return L;
-    if(m.AsciiChar == currentCharacter) return M;
-    if(n.AsciiChar == currentCharacter) return N;
-    if(o.AsciiChar == currentCharacter) return O;
-    if(p.AsciiChar == currentCharacter) return P;
-    if(q.AsciiChar == currentCharacter) return Q;
-    if(r.AsciiChar == currentCharacter) return R;
-    if(s.AsciiChar == currentCharacter) return S;
-    if(t.AsciiChar == currentCharacter) return T;
-    if(u.AsciiChar == currentCharacter) return U;
-    if(v.AsciiChar == currentCharacter) return V;
-    if(w.AsciiChar == currentCharacter) return W;
-    if(x.AsciiChar == currentCharacter) return X;
-    if(y.AsciiChar == currentCharacter) return Y;
-    if(z.AsciiChar == currentCharacter) return Z;
+    else if(b.AsciiChar == currentCharacter) return B;
+    else if(c.AsciiChar == currentCharacter) return C;
+    else if(d.AsciiChar == currentCharacter) return D;
+    else if(e.AsciiChar == currentCharacter) return E;
+    else if(f.AsciiChar == currentCharacter) return F;
+    else if(g.AsciiChar == currentCharacter) return G;
+    else if(h.AsciiChar == currentCharacter) return H;
+    else if(i.AsciiChar == currentCharacter) return I;
+    else if(j.AsciiChar == currentCharacter) return J;
+    else if(k.AsciiChar == currentCharacter) return K;
+    else if(l.AsciiChar == currentCharacter) return L;
+    else if(m.AsciiChar == currentCharacter) return M;
+    else if(n.AsciiChar == currentCharacter) return N;
+    else if(o.AsciiChar == currentCharacter) return O;
+    else if(p.AsciiChar == currentCharacter) return P;
+    else if(q.AsciiChar == currentCharacter) return Q;
+    else if(r.AsciiChar == currentCharacter) return R;
+    else if(s.AsciiChar == currentCharacter) return S;
+    else if(t.AsciiChar == currentCharacter) return T;
+    else if(u.AsciiChar == currentCharacter) return U;
+    else if(v.AsciiChar == currentCharacter) return V;
+    else if(w.AsciiChar == currentCharacter) return W;
+    else if(x.AsciiChar == currentCharacter) return X;
+    else if(y.AsciiChar == currentCharacter) return Y;
+    else if(z.AsciiChar == currentCharacter) return Z;
 
-    if(zero.AsciiChar == currentCharacter) return ZERO;
-    if(one.AsciiChar == currentCharacter) return ONE;
-    if(two.AsciiChar == currentCharacter) return TWO;
-    if(three.AsciiChar == currentCharacter) return THREE;
-    if(four.AsciiChar == currentCharacter) return FOUR;
-    if(five.AsciiChar == currentCharacter) return FIVE;
-    if(six.AsciiChar == currentCharacter) return SIX;
-    if(seven.AsciiChar == currentCharacter) return SEVEN;
-    if(eight.AsciiChar == currentCharacter) return EIGHT;
-    if(nine.AsciiChar == currentCharacter) return NINE;
+    else if(zero.AsciiChar == currentCharacter) return ZERO;
+    else if(one.AsciiChar == currentCharacter) return ONE;
+    else if(two.AsciiChar == currentCharacter) return TWO;
+    else if(three.AsciiChar == currentCharacter) return THREE;
+    else if(four.AsciiChar == currentCharacter) return FOUR;
+    else if(five.AsciiChar == currentCharacter) return FIVE;
+    else if(six.AsciiChar == currentCharacter) return SIX;
+    else if(seven.AsciiChar == currentCharacter) return SEVEN;
+    else if(eight.AsciiChar == currentCharacter) return EIGHT;
+    else if(nine.AsciiChar == currentCharacter) return NINE;
+    else return "?";
 }
 
 //This function checks what character the input morse string represents, and returns that character if there is a match. Else it returns the space character
 void readMorseString()
 {
-    printf("\n");               //skip line from morse adding
+    printf("\n\n");               //skip line from morse adding
     char currChar = morseString[0];
     int length = 0;
     for(int i = 0; currChar != '\0'; i++)
@@ -193,19 +206,27 @@ void readMorseString()
 
     if(currentLevel == 0) 
     {
-        if(currChar == 'E') 
+        if(currChar == '1') 
         {
+            set_led_color(3);
+            printf("Welcome to level 1\n");
+            printf("Ascii characters will appear along with their morse codes. Enter the correct code to move onto next character\n");
             currentLevel = 1;
             lifeCount = 3;
             currentCharacter = level01();
+            char * morseRepresentation = findMorseCode();
+            printf("Its morse code represenation is %s\n\n", morseRepresentation);
         }
         else if(currChar == '2')
         {
+            set_led_color(3);
+            printf("Welcome to level 2\n");
+            printf("Ascii characters will appear without their morse codes. Enter the correct code to move onto next character\n");
             currentLevel = 2;
             lifeCount = 3;
             currentCharacter = level02();
         }
-        else printf("wrong input");
+        else printf("wrong input\n");
     }
     else
     {
@@ -219,14 +240,21 @@ void readMorseString()
                 if(currentLevel == 1) currentLevel = 2;
                 if(currentLevel == 2) printf("You Win!");
             }
-            increaseLifeCount();
-            printf("%i\n", correctInARow);
-            if(currentLevel == 1) currentCharacter = level01();
-            else if (currentLevel == 2) currentCharacter = level02();
+            changeLifeCount(1);
+            if(currentLevel == 1) 
+            {
+                currentCharacter = level01();
+                char * morseRepresentation = findMorseCode();
+                printf("Its morse code represenation is %s\n", morseRepresentation);
+            }
+            else if (currentLevel == 2) 
+            {
+                currentCharacter = level02();
+            }
         }
         else 
         {
-            lifeCount--;
+            changeLifeCount(0);
             correctInARow = 0;
             if(lifeCount == 0) printf("You Lost!");
             else if(lifeCount == 1) printf("Wrong! You lost a life! You have %i life remaining\n", lifeCount);
@@ -248,22 +276,7 @@ int main() {
     uint offset = pio_add_program(pio, &ws2812_program);
     ws2812_program_init(pio, 0, offset, WS2812_PIN, 800000, IS_RGBW);
 
-    // Do forever...
-    while(true) {
-
-        // Set the color to red at half intensity
-        put_pixel(urgb_u32(0x7F, 0x00, 0x00));
-        sleep_ms(500);
-
-        // Set the color to green at half intensity
-        put_pixel(urgb_u32(0x00, 0x7F, 0x00));
-        sleep_ms(500);
-
-        // Set the color to blue at half intensity
-        put_pixel(urgb_u32(0x00, 0x00, 0x7F));
-        sleep_ms(500);
-
-    }
+    set_led_color(4);           //set LED to blue
  
     printf("██     ██ ███████ ██       ██████  ██████  ███    ███ ███████ ██ \n");
     printf("██     ██ ██      ██      ██      ██    ██ ████  ████ ██      ██ \n");
@@ -281,10 +294,8 @@ int main() {
     printf("You will be presented with an alphanumeric character (A-Z/0-9)\n");
 	printf("Enter the correct equivalent Morse Code sequence to progress!\n");
 	printf("Choose a Level:\n");
-	printf("Level 1: Morse Code equivalent shown\n");
-	printf("Level 2: Morse Code equivalent not shown\n");
-    printf("Enter .. for Level 1\n");
-    printf("Enter -- for Level 2\n");
+	printf(".---- Level 1: Morse Code equivalent shown\n");
+	printf("..--- Level 2: Morse Code equivalent not shown\n\n");
 
     //char input = readMorseString;
     main_asm(); // Jump into the ASM code

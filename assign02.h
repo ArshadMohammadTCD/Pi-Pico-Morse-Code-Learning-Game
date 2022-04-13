@@ -92,7 +92,7 @@ char currentCharacter;
 
 char level01();
 char level02();
-void increaseLifeCount();
+void changeLifeCount(bool upOrDown);
 
 void asm_gpio_init(uint pin);
 void asm_gpio_set_dir(uint pin, bool out);

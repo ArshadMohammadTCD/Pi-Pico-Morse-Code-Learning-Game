@@ -6,8 +6,6 @@
 char level01()
 {
     char currChar;
-    printf("Welcome to level 1\n");
-    printf("Ascii characters will appear along with their morse codes. Enter the correct code to move onto next character\n");
     int randomIndex = rand() % 36;
 
     switch(randomIndex) 
@@ -131,8 +129,6 @@ char level01()
 char level02()
 {
     char currChar;
-    printf("Welcome to level 2\n");
-    printf("Ascii characters will appear along with their morse codes. Enter the correct code to move onto next character\n");
     int randomIndex = rand() % 36;
 
     switch(randomIndex) 
@@ -249,7 +245,7 @@ char level02()
                 currChar = '?';
                 printf("Invalid number");
         }
-    printf("The next character is %c\n", currChar);
+    printf("The next character is %c\n\n", currChar);
     return currChar;
 }
     
