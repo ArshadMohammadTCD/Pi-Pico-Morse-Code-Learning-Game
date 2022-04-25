@@ -11,7 +11,6 @@ Its probably not a bad idea to refer to the Pi Pico documentation https://www.ra
 
 
 
-
 # Documentation 
 
 Group 28:
@@ -21,7 +20,7 @@ AMMAR MAGOMADOV
 JAMES MERRINS PRYCE
 ARSHAD MOHAMMED
 KEVIN MORLEY
-THOMAS MORONEY
+THOMAS PATRICK MORONEY
 
 Introduction
 The objective of this project is to create a game that teaches players how to use morse code. The player will be able to choose a difficulty level, and based on their chosen level  it will determine whether or not the morse code is provided.  The levels are as follows:
